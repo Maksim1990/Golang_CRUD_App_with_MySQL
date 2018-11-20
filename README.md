@@ -1,17 +1,9 @@
-# Go-MySQL-Example
-Golang MySQL Signup Example
+# Golang_CRUD_App_with_MySQL
+Golcang CRUD and Authentification application with MySQL database connection
 
-### Golang MySQL Signup Example 
+### How To Run
 
-#### Requires: 
-
-* [golang.org/x/crypto/bcrypt](https://godoc.org/golang.org/x/crypto/bcrypt)
-
-* [github.com/go-sql-driver/mysql](https://github.com/go-sql-driver/mysql)
-
-### How To Run 
-
-Create a new database with a users table 
+1) Create a new database with a users table
 
 ```sql
 CREATE TABLE users(
@@ -21,26 +13,24 @@ CREATE TABLE users(
 );
 ```
 
-Go get both required packages listed below 
+2) Go get both required packages listed below
 
-```bash
+```
 go get golang.org/x/crypto/bcrypt
 
 go get github.com/go-sql-driver/mysql
 ```
 
-Inside of **signup.go** line **77** replace <example> with your own credentials
+3) In  **signup.go** and **main.go** set correct DB connection
 
-```go
-db, err = sql.Open("mysql", "<root>:<password>@/<dbname>")
-// Replace with 
-db, err = sql.Open("mysql", "myUsername:myPassword@/myDatabase")
+4) For CRUD example run
 ```
+go run main.go
+```
+and navigate to [http://localhost:8090/](http://localhost:8090/)
 
-
-
-
-
-
-
-
+4) For Authentification example run
+```
+go run signup.go
+```
+and navigate to [http://localhost:8080/](http://localhost:8080/)
