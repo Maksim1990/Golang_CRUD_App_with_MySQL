@@ -29,40 +29,6 @@ func dbConn() (db *sql.DB) {
     return db
 }
 
-func Page(ctx *gin.Context){
-        //render only file, must full name with extension
-        ctx.HTML(http.StatusOK, "page.html", gin.H{"title": "Page file title!!"})
-}
-
-func main() {
-    router := gin.Default()
-
-    //new template engine
-    router.HTMLRender = gintemplate.Default()
-
-    router.GET("/test", func(ctx *gin.Context) {
-        //render with master
-        ctx.HTML(http.StatusOK, "test", gin.H{
-            "title": "Index title!",
-            "add": func(a int, b int) int {
-                return a + b
-            },
-        })
-    })
-
-
-    router.GET("/page", Page)
-    router.GET("/", Index)
-    router.GET("/edit", Edit)
-    router.POST("/update", Update)
-    router.GET("/show", Show)
-    router.GET("/delete", Delete)
-    router.GET("/new", New)
-    router.POST("/insert", Insert)
-
-    router.Run(":9090")
-}
-
 func New(ctx *gin.Context) {
     ctx.HTML(http.StatusOK, "new", nil)
 }
@@ -131,14 +97,14 @@ func Edit(ctx *gin.Context) {
 
 func Insert(ctx *gin.Context) {
     db := dbConn()
-        name := ctx.PostForm("name")
-        city := ctx.PostForm("city")
-        insForm, err := db.Prepare("INSERT INTO employee(name, city) VALUES(?,?)")
-        if err != nil {
-            panic(err.Error())
-        }
-        insForm.Exec(name, city)
-        log.Println("INSERT: Name: " + name + " | City: " + city)
+    name := ctx.PostForm("name")
+    city := ctx.PostForm("city")
+    insForm, err := db.Prepare("INSERT INTO employee(name, city) VALUES(?,?)")
+    if err != nil {
+        panic(err.Error())
+    }
+    insForm.Exec(name, city)
+    log.Println("INSERT: Name: " + name + " | City: " + city)
 
     defer db.Close()
     ctx.Redirect(http.StatusMovedPermanently, "/")
@@ -147,15 +113,15 @@ func Insert(ctx *gin.Context) {
 func Update(ctx *gin.Context) {
     db := dbConn()
 
-        name := ctx.PostForm("name")
-        city := ctx.PostForm("city")
-        id := ctx.PostForm("uid")
-        insForm, err := db.Prepare("UPDATE employee SET name=?, city=? WHERE id=?")
-        if err != nil {
-            panic(err.Error())
-        }
-        insForm.Exec(name, city, id)
-        log.Println("UPDATE: Name: " + name + " | City: " + city)
+    name := ctx.PostForm("name")
+    city := ctx.PostForm("city")
+    id := ctx.PostForm("uid")
+    insForm, err := db.Prepare("UPDATE employee SET name=?, city=? WHERE id=?")
+    if err != nil {
+        panic(err.Error())
+    }
+    insForm.Exec(name, city, id)
+    log.Println("UPDATE: Name: " + name + " | City: " + city)
 
     defer db.Close()
     ctx.Redirect(http.StatusMovedPermanently, "/")
@@ -182,8 +148,35 @@ func Index(ctx *gin.Context) {
         res = append(res, emp)
     }
 
-        ctx.HTML(http.StatusOK, "index", gin.H{
-            "res": res,
-        })
+    ctx.HTML(http.StatusOK, "index", gin.H{
+        "res": res,
+    })
     defer db.Close()
+}
+
+func main() {
+    router := gin.Default()
+
+    //new template engine
+    router.HTMLRender = gintemplate.Default()
+
+    router.GET("/test", func(ctx *gin.Context) {
+        //render with master
+        ctx.HTML(http.StatusOK, "test", gin.H{
+            "title": "Index title!",
+            "add": func(a int, b int) int {
+                return a + b
+            },
+        })
+    })
+
+    router.GET("/", Index)
+    router.GET("/edit", Edit)
+    router.POST("/update", Update)
+    router.GET("/show", Show)
+    router.GET("/delete", Delete)
+    router.GET("/new", New)
+    router.POST("/insert", Insert)
+
+    router.Run(":9090")
 }
