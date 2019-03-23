@@ -17,8 +17,8 @@ type Employee struct {
 
 func dbConn() (db *sql.DB) {
     dbDriver := "mysql"
-    dbUser := "admin"
-    dbPass := "qwerty"
+    dbUser := "root"
+    dbPass := "root"
     dbName := "goblog"
     db, err := sql.Open(dbDriver, dbUser+":"+dbPass+"@/"+dbName)
     if err != nil {
@@ -31,7 +31,7 @@ var tmpl = template.Must(template.ParseGlob("form/*"))
 
 func Index(w http.ResponseWriter, r *http.Request) {
     db := dbConn()
-    selDB, err := db.Query("SELECT * FROM Employee ORDER BY id DESC")
+    selDB, err := db.Query("SELECT * FROM employee ORDER BY id DESC")
     if err != nil {
         panic(err.Error())
     }
@@ -56,7 +56,7 @@ func Index(w http.ResponseWriter, r *http.Request) {
 func Show(w http.ResponseWriter, r *http.Request) {
     db := dbConn()
     nId := r.URL.Query().Get("id")
-    selDB, err := db.Query("SELECT * FROM Employee WHERE id=?", nId)
+    selDB, err := db.Query("SELECT * FROM employee WHERE id=?", nId)
     if err != nil {
         panic(err.Error())
     }
@@ -83,7 +83,7 @@ func New(w http.ResponseWriter, r *http.Request) {
 func Edit(w http.ResponseWriter, r *http.Request) {
     db := dbConn()
     nId := r.URL.Query().Get("id")
-    selDB, err := db.Query("SELECT * FROM Employee WHERE id=?", nId)
+    selDB, err := db.Query("SELECT * FROM employee WHERE id=?", nId)
     if err != nil {
         panic(err.Error())
     }
@@ -108,7 +108,7 @@ func Insert(w http.ResponseWriter, r *http.Request) {
     if r.Method == "POST" {
         name := r.FormValue("name")
         city := r.FormValue("city")
-        insForm, err := db.Prepare("INSERT INTO Employee(name, city) VALUES(?,?)")
+        insForm, err := db.Prepare("INSERT INTO employee(name, city) VALUES(?,?)")
         if err != nil {
             panic(err.Error())
         }
@@ -125,7 +125,7 @@ func Update(w http.ResponseWriter, r *http.Request) {
         name := r.FormValue("name")
         city := r.FormValue("city")
         id := r.FormValue("uid")
-        insForm, err := db.Prepare("UPDATE Employee SET name=?, city=? WHERE id=?")
+        insForm, err := db.Prepare("UPDATE employee SET name=?, city=? WHERE id=?")
         if err != nil {
             panic(err.Error())
         }
@@ -139,7 +139,7 @@ func Update(w http.ResponseWriter, r *http.Request) {
 func Delete(w http.ResponseWriter, r *http.Request) {
     db := dbConn()
     emp := r.URL.Query().Get("id")
-    delForm, err := db.Prepare("DELETE FROM Employee WHERE id=?")
+    delForm, err := db.Prepare("DELETE FROM employee WHERE id=?")
     if err != nil {
         panic(err.Error())
     }
