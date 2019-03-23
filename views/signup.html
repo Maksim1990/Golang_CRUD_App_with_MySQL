@@ -1,15 +1,16 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Sign Up</title>
-</head>
+{{define "head"}}
+    <style>
+        .hello{ color: red;}
+        hr{ border: 1px #ccc dashed;}
+    </style>
+{{end}}
 
-<body>
+
+{{define "content"}}
     <h1>SignUp Page</h1>
     <form method="POST" action="/signup">
         <input type="text" name="username" placeholder="username">
         <input type="password" name="password" placeholder="password">
         <input type="submit" value="SignUp">
     </form>
-</body>
-</html>
+{{end}}

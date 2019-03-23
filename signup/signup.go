@@ -77,7 +77,7 @@ func loginPage(res http.ResponseWriter, req *http.Request) {
 }
 
 func homePage(res http.ResponseWriter, req *http.Request) {
-	http.ServeFile(res, req, "index.html")
+	http.ServeFile(res, req, "login_index.html")
 }
 
 func main() {
