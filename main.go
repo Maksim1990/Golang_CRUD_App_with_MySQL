@@ -4,7 +4,7 @@ import (
     "database/sql"
     "log"
     "net/http"
-    "text/template"
+    "html/template"
 
     _ "github.com/go-sql-driver/mysql"
 )
@@ -27,7 +27,7 @@ func dbConn() (db *sql.DB) {
     return db
 }
 
-var tmpl = template.Must(template.ParseGlob("form/*"))
+var tmpl = template.Must(template.ParseGlob("form_gohtml/*"))
 
 func Index(w http.ResponseWriter, r *http.Request) {
     db := dbConn()
