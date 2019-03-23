@@ -155,6 +155,8 @@ func Index(ctx *gin.Context) {
 }
 
 func main() {
+    //-- Enable debug color in console
+    gin.ForceConsoleColor()
     router := gin.Default()
 
     //new template engine
