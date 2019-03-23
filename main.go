@@ -12,6 +12,9 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
+var db *sql.DB
+var err error
+
 type Employee struct {
 	Id   int
 	Name string
@@ -194,20 +197,14 @@ func main() {
 	router.POST("/insert", Insert)
 
 	router.GET("/home", homePageTest)
-
 	router.GET("/signup", signUpView)
 	router.POST("/signup", signUp)
-
 	router.GET("/login", loginView)
 	router.POST("/login", loginPage)
-
-	//http.HandleFunc("/login", loginPage)
 
 	router.Run(":9090")
 }
 
-var db *sql.DB
-var err error
 
 func signUpView(ctx *gin.Context) {
 	ctx.HTML(http.StatusOK, "signup", nil)
@@ -273,7 +270,6 @@ func loginPage(ctx *gin.Context) {
 		ctx.Redirect(http.StatusMovedPermanently, "/login")
 		return
 	}
-
 	ctx.Redirect(http.StatusMovedPermanently, "/")
 
 }
