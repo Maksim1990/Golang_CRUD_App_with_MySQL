@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"github.com/foolin/gin-template"
 	"github.com/gin-contrib/sessions"
-	"github.com/gin-contrib/sessions/cookie"
+	"github.com/gin-contrib/sessions/redis"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
 	"log"
@@ -13,9 +13,6 @@ import (
 	_ "github.com/gin-gonic/gin"
 	_ "github.com/go-sql-driver/mysql"
 )
-
-
-var store = cookie.NewStore([]byte("secret"))
 
 type Employee struct {
 	Id   int
@@ -36,7 +33,7 @@ func dbConn() (db *sql.DB) {
 }
 
 func New(ctx *gin.Context) {
-		ctx.HTML(http.StatusOK, "new", nil)
+	ctx.HTML(http.StatusOK, "new", nil)
 }
 func Delete(ctx *gin.Context) {
 	db := dbConn()
@@ -154,15 +151,14 @@ func Index(ctx *gin.Context) {
 		res = append(res, emp)
 	}
 
-
 	session := sessions.Default(ctx)
 	user := session.Get("user")
 	if user != nil {
 		ctx.HTML(http.StatusOK, "index", gin.H{
-			"res": res,
+			"res":  res,
 			"user": user,
 		})
-	}else {
+	} else {
 		ctx.Redirect(http.StatusMovedPermanently, "/login")
 	}
 	defer db.Close()
@@ -185,7 +181,7 @@ func main() {
 	router := gin.Default()
 
 	//-- Initialize Session based on Cookies
-	store := cookie.NewStore([]byte("secret"))
+	store, _ := redis.NewStore(10, "tcp", "localhost:6379", "", []byte("secret"))
 	router.Use(sessions.Sessions("mysession", store))
 
 	//new template engine
@@ -198,7 +194,6 @@ func main() {
 	router.GET("/logout", Logout)
 	router.POST("/login", loginPage)
 
-
 	router.GET("/home", Index)
 	router.GET("/edit", Edit)
 	router.POST("/update", Update)
@@ -207,18 +202,15 @@ func main() {
 	router.GET("/new", New)
 	router.POST("/insert", Insert)
 
-
-
-
 	router.Run(":9090")
 }
+
 var db *sql.DB
 var err error
 
-
 func signUpView(ctx *gin.Context) {
 	session := sessions.Default(ctx)
-	flashes:=session.Flashes()
+	flashes := session.Flashes()
 	session.Save()
 	ctx.HTML(http.StatusOK, "signup", gin.H{
 		"flashes": flashes,
@@ -226,7 +218,7 @@ func signUpView(ctx *gin.Context) {
 }
 func loginView(ctx *gin.Context) {
 	session := sessions.Default(ctx)
-	flashes:=session.Flashes()
+	flashes := session.Flashes()
 	session.Save()
 	ctx.HTML(http.StatusOK, "login", gin.H{
 		"flashes": flashes,
@@ -244,35 +236,35 @@ func signUp(ctx *gin.Context) {
 
 	switch {
 	case username == "":
-		setFlashMessage("Username can not be empty",ctx)
+		setFlashMessage("Username can not be empty", ctx)
 		ctx.Redirect(http.StatusMovedPermanently, "/signup")
 		return
 	case password == "":
-		setFlashMessage("Password can not be empty",ctx)
+		setFlashMessage("Password can not be empty", ctx)
 		ctx.Redirect(http.StatusMovedPermanently, "/signup")
 		return
 	case err == sql.ErrNoRows:
 		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 		if err != nil {
-			setFlashMessage("Server error while hashing provided password value.",ctx)
+			setFlashMessage("Server error while hashing provided password value.", ctx)
 			ctx.Redirect(http.StatusMovedPermanently, "/signup")
 			return
 		}
 
 		_, err = db.Exec("INSERT INTO users(username, password) VALUES(?, ?)", username, hashedPassword)
 		if err != nil {
-			setFlashMessage("Server error while register in DB provided data.",ctx)
+			setFlashMessage("Server error while register in DB provided data.", ctx)
 			ctx.Redirect(http.StatusMovedPermanently, "/signup")
 			return
 		}
 		ctx.Redirect(http.StatusMovedPermanently, "/home")
 
 	case err != nil:
-		setFlashMessage("Server error, unable to create your account.",ctx)
+		setFlashMessage("Server error, unable to create your account.", ctx)
 		ctx.Redirect(http.StatusMovedPermanently, "/signup")
 		return
 	default:
-		setFlashMessage("Server error.Such username already exist.",ctx)
+		setFlashMessage("Server error.Such username already exist.", ctx)
 		ctx.Redirect(http.StatusMovedPermanently, "/signup")
 	}
 }
@@ -289,14 +281,14 @@ func loginPage(ctx *gin.Context) {
 	err := db.QueryRow("SELECT username, password FROM users WHERE username=?", username).Scan(&databaseUsername, &databasePassword)
 
 	if err != nil {
-		setFlashMessage("Provided Username or Password are invalid.",ctx)
+		setFlashMessage("Provided Username or Password are invalid.", ctx)
 		ctx.Redirect(http.StatusMovedPermanently, "/login")
 		return
 	}
 
 	err = bcrypt.CompareHashAndPassword([]byte(databasePassword), []byte(password))
 	if err != nil {
-		setFlashMessage("Provided password is invalid.",ctx)
+		setFlashMessage("Provided password is invalid.", ctx)
 		ctx.Redirect(http.StatusMovedPermanently, "/login")
 		return
 	}
@@ -309,26 +301,16 @@ func loginPage(ctx *gin.Context) {
 
 func Logout(ctx *gin.Context) {
 	session := sessions.Default(ctx)
-		session.Delete("user")
-		session.Save()
+	session.Delete("user")
+	session.Save()
 
-		user := session.Get("user")
-		if user == nil {
-			ctx.Redirect(http.StatusMovedPermanently, "/login")
-
-		} else {
-			ctx.JSON(http.StatusBadRequest, gin.H{"error": "Cant delete session"})
-		}
-
-
-
-
+	ctx.Redirect(http.StatusMovedPermanently, "/login")
 }
 func authPage(ctx *gin.Context) {
 	ctx.HTML(http.StatusOK, "login_index", nil)
 }
 
-func setFlashMessage(message string,ctx *gin.Context) {
+func setFlashMessage(message string, ctx *gin.Context) {
 	session := sessions.Default(ctx)
 	session.AddFlash(message)
 	session.Save()
