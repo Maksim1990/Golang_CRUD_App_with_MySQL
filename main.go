@@ -15,7 +15,7 @@ import (
 )
 
 
-
+var store = cookie.NewStore([]byte("secret"))
 
 type Employee struct {
 	Id   int
@@ -36,7 +36,7 @@ func dbConn() (db *sql.DB) {
 }
 
 func New(ctx *gin.Context) {
-	ctx.HTML(http.StatusOK, "new", nil)
+		ctx.HTML(http.StatusOK, "new", nil)
 }
 func Delete(ctx *gin.Context) {
 	db := dbConn()
@@ -154,9 +154,17 @@ func Index(ctx *gin.Context) {
 		res = append(res, emp)
 	}
 
-	ctx.HTML(http.StatusOK, "index", gin.H{
-		"res": res,
-	})
+
+	session := sessions.Default(ctx)
+	user := session.Get("user")
+	if user != nil {
+		ctx.HTML(http.StatusOK, "index", gin.H{
+			"res": res,
+			"user": user,
+		})
+	}else {
+		ctx.Redirect(http.StatusMovedPermanently, "/login")
+	}
 	defer db.Close()
 }
 
@@ -183,15 +191,13 @@ func main() {
 	//new template engine
 	router.HTMLRender = gintemplate.Default()
 
-	router.GET("/test", func(ctx *gin.Context) {
-		//render with master
-		ctx.HTML(http.StatusOK, "test", gin.H{
-			"title": "Index title!",
-			"add": func(a int, b int) int {
-				return a + b
-			},
-		})
-	})
+	router.GET("/", authPage)
+	router.GET("/signup", signUpView)
+	router.POST("/signup", signUp)
+	router.GET("/login", loginView)
+	router.GET("/logout", Logout)
+	router.POST("/login", loginPage)
+
 
 	router.GET("/home", Index)
 	router.GET("/edit", Edit)
@@ -201,16 +207,14 @@ func main() {
 	router.GET("/new", New)
 	router.POST("/insert", Insert)
 
-	router.GET("/", authPage)
-	router.GET("/signup", signUpView)
-	router.POST("/signup", signUp)
-	router.GET("/login", loginView)
-	router.POST("/login", loginPage)
+
+
 
 	router.Run(":9090")
 }
 var db *sql.DB
 var err error
+
 
 func signUpView(ctx *gin.Context) {
 	session := sessions.Default(ctx)
@@ -275,7 +279,7 @@ func signUp(ctx *gin.Context) {
 
 func loginPage(ctx *gin.Context) {
 
-
+	session := sessions.Default(ctx)
 	username := ctx.PostForm("username")
 	password := ctx.PostForm("password")
 
@@ -296,10 +300,30 @@ func loginPage(ctx *gin.Context) {
 		ctx.Redirect(http.StatusMovedPermanently, "/login")
 		return
 	}
+
+	session.Set("user", username)
+	session.Save()
 	ctx.Redirect(http.StatusMovedPermanently, "/home")
 
 }
 
+func Logout(ctx *gin.Context) {
+	session := sessions.Default(ctx)
+		session.Delete("user")
+		session.Save()
+
+		user := session.Get("user")
+		if user == nil {
+			ctx.Redirect(http.StatusMovedPermanently, "/login")
+
+		} else {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": "Cant delete session"})
+		}
+
+
+
+
+}
 func authPage(ctx *gin.Context) {
 	ctx.HTML(http.StatusOK, "login_index", nil)
 }
