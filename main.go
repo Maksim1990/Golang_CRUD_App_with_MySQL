@@ -48,7 +48,7 @@ func Delete(ctx *gin.Context) {
 	delForm.Exec(emp)
 	log.Println("DELETE")
 	defer db.Close()
-	ctx.Redirect(http.StatusMovedPermanently, "/")
+	ctx.Redirect(http.StatusMovedPermanently, "/home")
 }
 
 func Show(ctx *gin.Context) {
@@ -113,7 +113,7 @@ func Insert(ctx *gin.Context) {
 	log.Println("INSERT: Name: " + name + " | City: " + city)
 
 	defer db.Close()
-	ctx.Redirect(http.StatusMovedPermanently, "/")
+	ctx.Redirect(http.StatusMovedPermanently, "/home")
 }
 
 func Update(ctx *gin.Context) {
@@ -130,7 +130,7 @@ func Update(ctx *gin.Context) {
 	log.Println("UPDATE: Name: " + name + " | City: " + city)
 
 	defer db.Close()
-	ctx.Redirect(http.StatusMovedPermanently, "/")
+	ctx.Redirect(http.StatusMovedPermanently, "/home")
 }
 
 func Index(ctx *gin.Context) {
@@ -193,7 +193,7 @@ func main() {
 		})
 	})
 
-	router.GET("/", Index)
+	router.GET("/home", Index)
 	router.GET("/edit", Edit)
 	router.POST("/update", Update)
 	router.GET("/show", Show)
@@ -201,7 +201,7 @@ func main() {
 	router.GET("/new", New)
 	router.POST("/insert", Insert)
 
-	router.GET("/home", homePageTest)
+	router.GET("/", authPage)
 	router.GET("/signup", signUpView)
 	router.POST("/signup", signUp)
 	router.GET("/login", loginView)
@@ -261,7 +261,7 @@ func signUp(ctx *gin.Context) {
 			ctx.Redirect(http.StatusMovedPermanently, "/signup")
 			return
 		}
-		ctx.Redirect(http.StatusMovedPermanently, "/")
+		ctx.Redirect(http.StatusMovedPermanently, "/home")
 
 	case err != nil:
 		setFlashMessage("Server error, unable to create your account.",ctx)
@@ -296,11 +296,11 @@ func loginPage(ctx *gin.Context) {
 		ctx.Redirect(http.StatusMovedPermanently, "/login")
 		return
 	}
-	ctx.Redirect(http.StatusMovedPermanently, "/")
+	ctx.Redirect(http.StatusMovedPermanently, "/home")
 
 }
 
-func homePageTest(ctx *gin.Context) {
+func authPage(ctx *gin.Context) {
 	ctx.HTML(http.StatusOK, "login_index", nil)
 }
 
