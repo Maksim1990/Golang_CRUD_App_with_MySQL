@@ -37,6 +37,7 @@ func dbConn() (db *sql.DB) {
 func New(ctx *gin.Context) {
 	ctx.HTML(http.StatusOK, "new", nil)
 }
+
 func Delete(ctx *gin.Context) {
 	db := dbConn()
 	emp := ctx.Request.URL.Query().Get("id")
@@ -166,55 +167,6 @@ func Index(ctx *gin.Context) {
 	defer db.Close()
 }
 
-func main() {
-
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
-
-	db, err = sql.Open("mysql", "root:root@/goblog")
-	if err != nil {
-		panic(err.Error())
-	}
-	defer db.Close()
-
-	err = db.Ping()
-	if err != nil {
-		panic(err.Error())
-	}
-	//-- Enable debug color in console
-	gin.ForceConsoleColor()
-	router := gin.Default()
-
-	//-- Initialize Session based on Cookies
-	store, _ := redis.NewStore(10, "tcp", "localhost:6379", "", []byte("secret"))
-	router.Use(sessions.Sessions("mysession", store))
-
-	//new template engine
-	router.HTMLRender = gintemplate.Default()
-
-	router.GET("/", authPage)
-	router.GET("/signup", signUpView)
-	router.POST("/signup", signUp)
-	router.GET("/login", loginView)
-	router.GET("/logout", Logout)
-	router.POST("/login", loginPage)
-
-	router.GET("/home", Index)
-	router.GET("/edit", Edit)
-	router.POST("/update", Update)
-	router.GET("/show", Show)
-	router.GET("/delete", Delete)
-	router.GET("/new", New)
-	router.POST("/insert", Insert)
-
-	router.Run(":9090")
-}
-
-var db *sql.DB
-var err error
-
 func signUpView(ctx *gin.Context) {
 	session := sessions.Default(ctx)
 	flashes := session.Flashes()
@@ -234,6 +186,7 @@ func loginView(ctx *gin.Context) {
 }
 func signUp(ctx *gin.Context) {
 
+	db := dbConn()
 	username := ctx.PostForm("username")
 	password := ctx.PostForm("password")
 
@@ -278,6 +231,7 @@ func signUp(ctx *gin.Context) {
 
 func loginPage(ctx *gin.Context) {
 
+	db := dbConn()
 	session := sessions.Default(ctx)
 	username := ctx.PostForm("username")
 	password := ctx.PostForm("password")
@@ -322,3 +276,43 @@ func setFlashMessage(message string, ctx *gin.Context) {
 	session.AddFlash(message)
 	session.Save()
 }
+
+func main() {
+
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+
+	//-- Enable debug color in console
+	gin.ForceConsoleColor()
+	router := gin.Default()
+
+	//-- Initialize Session based on Cookies
+	store, _ := redis.NewStore(10, "tcp", "localhost:6379", "", []byte("secret"))
+	router.Use(sessions.Sessions("mysession", store))
+
+	//new template engine
+	router.HTMLRender = gintemplate.Default()
+
+	router.GET("/", authPage)
+	router.GET("/signup", signUpView)
+	router.POST("/signup", signUp)
+	router.GET("/login", loginView)
+	router.GET("/logout", Logout)
+	router.POST("/login", loginPage)
+
+	router.GET("/home", Index)
+	router.GET("/edit", Edit)
+	router.POST("/update", Update)
+	router.GET("/show", Show)
+	router.GET("/delete", Delete)
+	router.GET("/new", New)
+	router.POST("/insert", Insert)
+
+	router.Run(":9090")
+}
+
+
+
+
