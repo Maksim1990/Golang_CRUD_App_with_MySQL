@@ -1,5 +1,6 @@
 # Golang_CRUD_App_with_MySQL
-Golcang CRUD and Authentification application with MySQL database connection
+Golcang CRUD and Authentification application with MySQL database connection.
+Based on main functionality of [Gin](https://gin-gonic.com/) framework
 
 ### How To Run
 
@@ -56,3 +57,14 @@ gin -i -all run main.go
 ```
 and navigate to [http://localhost:9090/](http://localhost:9090/)
 
+
+### Demo papp preview
+
+1) Example of application **Login** page
+![Mockup for feature A](https://github.com/Maksim1990/Golang_CRUD_App_with_MySQL/blob/master/github/1.PNG?raw=true)
+
+1) Example of application **Home** page
+![Mockup for feature A](https://github.com/Maksim1990/Golang_CRUD_App_with_MySQL/blob/master/github/2.PNG?raw=true)
+
+1) Example of application **Create new** page
+![Mockup for feature A](https://github.com/Maksim1990/Golang_CRUD_App_with_MySQL/blob/master/github/3.PNG?raw=true)
