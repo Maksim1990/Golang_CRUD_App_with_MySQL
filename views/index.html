@@ -1,0 +1,39 @@
+{{define "head"}}
+    <style>
+        .hello{ color: red;}
+        hr{ border: 1px #ccc dashed;}
+    </style>
+{{end}}
+
+
+{{define "content"}}
+    <h1 class="hello">TEST HERE</h1>
+    <p>
+        <a href="/new">CREATE</a>
+    </p>
+    <h2> List of users </h2>
+    <table border="1">
+        <thead>
+        <tr>
+            <td>ID</td>
+            <td>Name</td>
+            <td>City</td>
+            <td>Show</td>
+            <td>Edit</td>
+            <td>Delete</td>
+        </tr>
+        </thead>
+        <tbody>
+        {{ range .res }}
+            <tr>
+                <td>{{ .Id }}</td>
+                <td> {{ .Name }} </td>
+                <td>{{ .City }} </td>
+                <td><a href="/show?id={{ .Id }}">Show</a></td>
+                <td><a href="/edit?id={{ .Id }}">Edit</a></td>
+                <td><a href="/delete?id={{ .Id }}">Delete</a><td>
+            </tr>
+        {{ end }}
+        </tbody>
+    </table>
+{{end}}

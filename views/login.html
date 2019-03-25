@@ -1,0 +1,21 @@
+{{define "head"}}
+    <style>
+        .hello{ color: red;}
+        hr{ border: 1px #ccc dashed;}
+    </style>
+{{end}}
+
+
+{{define "content"}}
+    <h1>Login Page</h1>
+        {{range .flashes}}
+    <div class="alert alert-danger" role="alert">
+        {{.}}
+    </div>
+        {{end}}
+    <form method="POST" action="/login">
+        <input type="text" name="username" placeholder="username">
+        <input type="password" name="password" placeholder="password">
+        <input type="submit" value="Login">
+    </form>
+{{end}}

@@ -1,0 +1,13 @@
+{{define "head"}}
+    <style>
+        .hello{ color: red;}
+        hr{ border: 1px #ccc dashed;}
+    </style>
+{{end}}
+
+
+{{define "content"}}
+        <h2> User {{ .user.Id }} </h2>
+        <p>Name: {{ .user.Name }}</p>
+        <p>City:  {{ .user.City }}</p><br /> <a href="/edit?id={{ .user.Id }}">Edit</a></p>
+{{end}}
