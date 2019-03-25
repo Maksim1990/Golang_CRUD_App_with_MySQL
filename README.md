@@ -3,7 +3,8 @@ Golcang CRUD and Authentification application with MySQL database connection
 
 ### How To Run
 
-1) Create a new database with a users table
+1) Create a new database tables:
+- **users** table
 
 ```sql
 CREATE TABLE users(
@@ -13,24 +14,45 @@ CREATE TABLE users(
 );
 ```
 
+- **employee** table
+
+```sql
+CREATE TABLE employee(
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(50),
+    city VARCHAR(120)
+);
+```
+
 2) Go get both required packages listed below
 
 ```
+go get github.com/foolin/gin-template
+
+go get github.com/gin-contrib/sessions
+
+go get github.com/gin-contrib/sessions
+
+go get github.com/gin-gonic/gin
+
+go get github.com/joho/godotenv
+
 go get golang.org/x/crypto/bcrypt
 
 go get github.com/go-sql-driver/mysql
 ```
 
-3) In  **signup.go** and **main.go** set correct DB connection
+3) Run following command to prepare **.env** file
 
-4) For CRUD example run
 ```
-go run main.go
+cp .env.dist .env
 ```
-and navigate to [http://localhost:8090/](http://localhost:8090/)
+4) Fill in correct DB settings in **.env** file
 
-4) For Authentification example run
+4) Run following comand to start Gin framework server
 ```
-go run signup.go
+gin -i -all run main.go
+
 ```
-and navigate to [http://localhost:8080/](http://localhost:8080/)
+and navigate to [http://localhost:9090/](http://localhost:9090/)
+
