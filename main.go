@@ -6,9 +6,11 @@ import (
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/redis"
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 	"golang.org/x/crypto/bcrypt"
 	"log"
 	"net/http"
+	"os"
 
 	_ "github.com/gin-gonic/gin"
 	_ "github.com/go-sql-driver/mysql"
@@ -21,10 +23,10 @@ type Employee struct {
 }
 
 func dbConn() (db *sql.DB) {
-	dbDriver := "mysql"
-	dbUser := "root"
-	dbPass := "root"
-	dbName := "goblog"
+	dbDriver := os.Getenv("DB_ENGINE")
+	dbUser := os.Getenv("DB_USER")
+	dbPass := os.Getenv("DB_PASSWORD")
+	dbName := os.Getenv("DB_NAME")
 	db, err := sql.Open(dbDriver, dbUser+":"+dbPass+"@/"+dbName)
 	if err != nil {
 		panic(err.Error())
@@ -165,6 +167,11 @@ func Index(ctx *gin.Context) {
 }
 
 func main() {
+
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
 
 	db, err = sql.Open("mysql", "root:root@/goblog")
 	if err != nil {
