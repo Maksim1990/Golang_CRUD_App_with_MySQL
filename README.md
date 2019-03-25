@@ -1,5 +1,5 @@
 # Golang_CRUD_App_with_MySQL
-Golcang CRUD and Authentification application with MySQL database connection.
+Golang CRUD and Authentication application with MySQL database connection.
 
 - *Based on main functionality of [Gin](https://gin-gonic.com/) framework*
 - *Implemented routing functionality*
